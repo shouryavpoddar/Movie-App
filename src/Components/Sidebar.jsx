@@ -8,7 +8,7 @@ export default function Sidebar({ onChange = (screenIndex) => {}, defaultScreen 
 
     useEffect(() => {
         onChange(selectedScreen);
-    }, [selectedScreen, onChange]);
+    }, [selectedScreen]);
 
     return (
         <SidebarContext.Provider value={{ selectedScreen, setSelectedScreen, screenIndices, setScreenIndices }}>

@@ -1,16 +1,12 @@
 import Sidebar from "./Components/Sidebar";
-import Poster from "./Components/Poster";
 import SearchBar from "./Components/SearchBar";
-import MostTrendingMovie from "./Components/MostTrendingMovie";
 import genre from "./genre.json";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCategoriesMovies, setCategory } from "./State Manager/categoriesSlice";
+import { fetchCategoriesMovies } from "./State Manager/categoriesSlice";
 import { fetchNewReleaseMovies, fetchTopRatedMovies, fetchTrendingMovies } from "./State Manager/homePageSlice";
-import { Suspense, useEffect } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 
-function Loading() {
-    return <div className={"animate-pulse bg-slate-500 w-full h-[1000px]"}>Loading...</div>;
-}
+import withSuspense from "./hoc/withSuspence";
 
 export default function Home() {
     const watchlist = useSelector(state => state.watchlist.movies);
@@ -18,20 +14,24 @@ export default function Home() {
     const categorieMovies = useSelector(state => state.categories.movies);
     const { tendingMovies, newReleaseMovies, topRatedMovies } = useSelector(state => state.homePage);
 
+    const MostTrendingMovie = lazy(() => import('./Components/MostTrendingMovie'));
+    const Poster = lazy(() => import('./Components/Poster'));
+    const PosterWithSuspense = withSuspense(Poster, <div
+        className="animate-pulse rounded-3xl w-full h-[270px] bg-slate-200 flex items-center justify-center">
+        </div>);
+
     const changeScreen = (screenIndex) => {
-        if (genre.genres.reduce((acc, genre) => acc || genre.id === screenIndex, false)) {
+        if (genre.genres.some(genre => genre.id === screenIndex)) {
             console.log(screenIndex);
             dispatch(fetchCategoriesMovies(screenIndex));
         }
     };
 
     useEffect(() => {
-        (function () {
-            dispatch(fetchTopRatedMovies());
-            dispatch(fetchNewReleaseMovies());
-            dispatch(fetchTrendingMovies());
-        })();
-    }, [dispatch]);
+        dispatch(fetchTopRatedMovies());
+        dispatch(fetchNewReleaseMovies());
+        dispatch(fetchTrendingMovies());
+    }, []);
 
     return (
         <Sidebar defaultScreen={'Home'} onChange={changeScreen}>
@@ -40,40 +40,64 @@ export default function Home() {
                     <Sidebar.Item screenIndex={'Home'}>Home</Sidebar.Item>
                     <Sidebar.Item screenIndex={'Watchlist'}>Watchlist</Sidebar.Item>
                     <Sidebar.CollapsibleSection title={'Categories'}>
-                        {genre.genres.map((genre) => {
-                            return <Sidebar.Item key={genre.id} screenIndex={genre.id}>{genre.name}</Sidebar.Item>;
-                        })}
+                        {genre.genres.map((genre) => (
+                            <Sidebar.Item key={genre.id} screenIndex={genre.id}>{genre.name}</Sidebar.Item>
+                        ))}
                     </Sidebar.CollapsibleSection>
                 </Sidebar.ItemList>
             </Sidebar.Bar>
             <Sidebar.Body>
                 <Sidebar.Screen screenIndex={'Home'}>
                     <SearchBar />
-                    <MostTrendingMovie movie={tendingMovies[0]} />
+                    <Suspense fallback={
+                        <div
+                            className="animate-pulse rounded-3xl w-full h-[600px] bg-slate-200 flex items-center justify-center">
+                            Loading...
+                        </div>
+                    }>
+                        <MostTrendingMovie movie={tendingMovies[0]} />
+                    </Suspense>
                     <div className={'flex flex-col space-y-10'}>
                         <div className={'mt-10 items-center justify-start'}>
                             <h1 className={'font-medium text-2xl mb-5'}>Most Trending</h1>
-                            <div className={'flex flex-row gap-4 justify-between'}>
-                                {tendingMovies.map((movie, index) => {
-                                    if (0 < index && index < 6) return <Poster key={movie.id} movie={movie} />;
-                                    return null;
-                                })}
-                            </div>
+                                <div className={'grid grid-cols-5 gap-4'}>
+                                    {tendingMovies.map((movie, index) => {
+                                        if (index > 0 && index < 6){
+                                            return <PosterWithSuspense key={movie.id} movie={movie} />
+                                        //     <Suspense fallback={<div
+                                        //         className="animate-pulse rounded-3xl w-full h-[270px] bg-slate-200 flex items-center justify-center">
+                                        //         Loading...
+                                        //     </div>}>
+                                        //     <Poster key={movie.id} movie={movie} />
+                                        // </Suspense>
+                                        };
+                                        return null;
+                                    })}
+                                </div>
                         </div>
                         <div className={'mt-10 items-center justify-start'}>
                             <h1 className={'font-medium text-2xl mb-5'}>New Releases</h1>
-                            <div className={'flex flex-row gap-4 justify-between'}>
-                                {newReleaseMovies.map((movie, index) => {
-                                    if (index < 5) return <Poster key={movie.id} movie={movie} />;
-                                    return null;
-                                })}
-                            </div>
+                            <Suspense fallback={<div
+                                className="animate-pulse rounded-3xl w-full h-[270px] bg-slate-200 flex items-center justify-center">
+                                Loading...
+                            </div>}>
+                                <div className={'grid grid-cols-5 gap-4'}>
+                                    {newReleaseMovies.map((movie, index) => {
+                                        if (index < 5){
+                                            return <PosterWithSuspense key={movie.id} movie={movie} />
+                                        };
+                                        return null;
+                                    })}
+                                </div>
+                            </Suspense>
                         </div>
                         <div className={'mt-10 items-center justify-start'}>
                             <h1 className={'font-medium text-2xl mb-5'}>Top Rated Movies</h1>
                             <div className={'grid grid-cols-5 gap-4'}>
                                 {topRatedMovies.map((movie, index) => {
-                                    if (index < 5) return <Poster key={movie.id} movie={movie} />;
+                                    if (index < 5) {
+                                        return <PosterWithSuspense key={movie.id} movie={movie} />
+                                    }
                                     return null;
                                 })}
                             </div>
@@ -82,24 +106,22 @@ export default function Home() {
                 </Sidebar.Screen>
                 <Sidebar.Screen screenIndex={'Watchlist'}>
                     <h1 className={'font-medium text-2xl mb-5'}>Watchlist</h1>
-                    <div className={'grid grid-cols-5 gap-4'}>
-                        {watchlist.map((movie) => {
-                            return <Poster key={movie.id} movie={movie} />;
-                        })}
-                    </div>
+                        <div className={'grid grid-cols-5 gap-4'}>
+                            {watchlist.map((movie) => (
+                                <PosterWithSuspense key={movie.id} movie={movie} />
+                            ))}
+                        </div>
                 </Sidebar.Screen>
-                {genre.genres.map((genre) => {
-                    return (
-                        <Sidebar.Screen key={genre.id} screenIndex={genre.id}>
-                            <h1 className={'font-medium text-2xl mb-5'}>{genre.name}</h1>
+                {genre.genres.map((genre) => (
+                    <Sidebar.Screen key={genre.id} screenIndex={genre.id}>
+                        <h1 className={'font-medium text-2xl mb-5'}>{genre.name}</h1>
                             <div className={'grid grid-cols-5 gap-4'}>
-                                {categorieMovies?.map((movie) => {
-                                    return <Poster key={movie.id} movie={movie} />;
-                                })}
+                                {categorieMovies?.map((movie) => (
+                                    <PosterWithSuspense key={movie.id} movie={movie} />
+                                ))}
                             </div>
-                        </Sidebar.Screen>
-                    );
-                })}
+                    </Sidebar.Screen>
+                ))}
             </Sidebar.Body>
         </Sidebar>
     );

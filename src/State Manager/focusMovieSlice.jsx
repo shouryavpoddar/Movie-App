@@ -56,24 +56,24 @@ export const focusMovieSlice = createSlice({
     reducers: {
     },
     extraReducers: (builder) => {
-        builder.addCase(fetchMovie.pending, (state, action) => {console.log("fetching movie")})
+        builder.addCase(fetchMovie.pending, (state, action) => {console.log("fetching movie"); state.movie = {}})
         builder.addCase(fetchMovie.rejected, (state, action) => {console.log("failed to fetch movie")} )
         builder.addCase(fetchMovie.fulfilled, (state, action) => {
             state.movie = action.payload
         })
-        builder.addCase(fetchVideo.pending, (state, action) => {console.log("fetching video")})
+        builder.addCase(fetchVideo.pending, (state, action) => {console.log("fetching video"); state.movie.video = ''})
         builder.addCase(fetchVideo.rejected, (state, action) => {console.log("failed to fetch video")} )
         builder.addCase(fetchVideo.fulfilled, (state, action) => {
             console.log("fetched video")
             state.movie.video = action.payload
         })
-        builder.addCase(fetchSimilar.pending, (state, action) => {console.log("fetching similar")})
+        builder.addCase(fetchSimilar.pending, (state, action) => {console.log("fetching similar"); state.movie.similar = []})
         builder.addCase(fetchSimilar.rejected, (state, action) => {console.log("failed to fetch similar")} )
         builder.addCase(fetchSimilar.fulfilled, (state, action) => {
             console.log("fetched similar")
             state.movie.similar = action.payload
         })
-        builder.addCase(fetchMovieCredits.pending, (state, action) => {console.log("fetching credits")})
+        builder.addCase(fetchMovieCredits.pending, (state, action) => {console.log("fetching credits"); state.movie.topCast = []; state.movie.directors = []; state.movie.writers = []})
         builder.addCase(fetchMovieCredits.rejected, (state, action) => {console.log("failed to fetch credits")} )
         builder.addCase(fetchMovieCredits.fulfilled, (state, action) => {
             console.log("fetched credits")
