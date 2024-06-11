@@ -1,4 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {fetchMovieDetails, fetchSimilarMovies, fetchVideos, fetchMovieCredit} from "../ApiServicer/Api.js";
 
 const intialState = {
     movie:{
@@ -6,47 +7,31 @@ const intialState = {
     },
 }
 
-const options = {
-    method: 'GET',
-    headers: {
-        accept: 'application/json',
-        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjNGY3MjNhZTJmNDA3MGI3ZmJlNWRhZWQ1NDVlOGY5NCIsInN1YiI6IjY2NjAyZDQxZDA1OTlhMTJlNDdkOGJjMCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.QETDvBgk4dmvd4gdv1APW9h4fS3E1crpFEkyPwLyq_Y'
-    }
-};
-
 export const fetchMovie = createAsyncThunk(
     "focusMovies/fetchMovie", async (movie_id) => {
-        const response = await fetch(`https://api.themoviedb.org/3/movie/${movie_id}?language=en-US`, options).then(response => response.json())
-        console.log(response)
+        const response = await fetchMovieDetails(movie_id)
         return response;
     }
 )
 
 export const fetchVideo = createAsyncThunk(
     "focusMovie/fetchVideo", async (movie_id) => {
-        const response = await fetch(`https://api.themoviedb.org/3/movie/${movie_id}/videos?language=en-US`, options).then(response => response.json())
-        const trailer = response.results.find(video => video.type === "Trailer")
-        return trailer.key;
+        const response = await fetchVideos(movie_id);
+        return response;
     }
 )
 
 export const fetchSimilar = createAsyncThunk(
     "focusMovie/fetchSimilar", async (movie_id) => {
-        const response = await fetch(`https://api.themoviedb.org/3/movie/${movie_id}/similar?language=en-US`, options).then(response => response.json())
-        const top4 = response.results.sort((a, b) => b.popularity - a.popularity).slice(0, 4)
-        return top4;
+        const response = await fetchSimilarMovies(movie_id);
+        return response;
     }
 )
 
 export const fetchMovieCredits = createAsyncThunk(
     "focusMovie/fetchMovieCredits", async (movie_id) => {
-        const response = await fetch(`https://api.themoviedb.org/3/movie/${movie_id}/credits?language=en-US`, options).then(response => response.json())
-        const topCast= response.cast.slice(0, 4)
-        const directors = response.crew.filter(member => member.known_for_department === "Directing")
-        const writers = response.crew.filter(member => member.known_for_department === "Writing")
-        console.log("hello")
-        console.log({topCast, directors, writers})
-        return {topCast, directors, writers};
+        const response = await fetchMovieCredit(movie_id);
+        return response;
     }
 )
 
