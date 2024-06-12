@@ -1,6 +1,4 @@
 import React from 'react';
-import {useDispatch} from "react-redux";
-import {fetchVideo} from "../State Manager/focusMovieSlice";
 export default function VideoComponent({youtubeID}) {
 
     return (

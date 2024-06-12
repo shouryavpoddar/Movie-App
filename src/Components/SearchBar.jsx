@@ -1,18 +1,20 @@
-import { useDispatch } from "react-redux";
-import { fetchSearchMovies } from "../State Manager/searchMovieSlice";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {useQueryClient} from "@tanstack/react-query";
 
 export default function SearchBar() {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (searchTerm.trim()) {
-            dispatch(fetchSearchMovies(searchTerm));
+            queryClient.invalidateQueries("searchMovies");
+            queryClient.setQueryData("searchTerm", searchTerm);
+            navigate('/search');
         }
+        setSearchTerm("");
         navigate('/search');
         setSearchTerm("")
     };
@@ -20,11 +22,13 @@ export default function SearchBar() {
     useEffect(() => {
         const timer = setTimeout(() => {
             if (searchTerm.trim()) {
-                dispatch(fetchSearchMovies(searchTerm));
+                queryClient.invalidateQueries('searchMovies');
+                queryClient.setQueryData('searchTerm', searchTerm)
+                // dispatch(fetchSearchMovies(searchTerm));
                 navigate('/search');
                 setSearchTerm("")
             }
-        }, 500);
+        }, 800);
         return () => clearTimeout(timer);
     }, [searchTerm]);
 

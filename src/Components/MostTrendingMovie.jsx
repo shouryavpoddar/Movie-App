@@ -1,15 +1,18 @@
 import React from "react";
-import {fetchMovie, fetchMovieCredits, fetchSimilar, fetchVideo, focusMovie} from "../State Manager/focusMovieSlice";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
+import {useQueryClient} from "@tanstack/react-query";
 
 export default function MostTrendingMovie({movie}) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
 
     const handleClick = () => {
-        dispatch(fetchMovie(movie.id));
+        queryClient.invalidateQueries('movie');
+        queryClient.setQueryData('movieId', movie.id)
+        // dispatch(fetchMovie(movie.id));
         navigate('/movie');
     }
 
