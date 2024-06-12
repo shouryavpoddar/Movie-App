@@ -1,12 +1,11 @@
-import VideoComponent from "./Components/VideoComponent";
+
 import SearchBar from "./Components/SearchBar";
-import Poster from "./Components/Poster";
 import {useDispatch, useSelector} from "react-redux";
-import {useEffect, useState} from "react";
-import {fetchMovie, fetchMovieCredits, fetchSimilar, fetchVideo} from "./State Manager/focusMovieSlice";
-import async from "async";
+import React, {lazy, useEffect, useState} from "react";
+import { fetchMovieCredits, fetchSimilar, fetchVideo} from "./State Manager/focusMovieSlice";
 import {useNavigate} from "react-router-dom";
 import {addMovieToWatchlist, removeMovieFromWatchlist} from "./State Manager/watchlistSlice";
+import withSuspense from "./hoc/withSuspence";
 
 export default function MoviePage() {
     const movie = useSelector(state => state.focusMovie.movie);
@@ -14,6 +13,15 @@ export default function MoviePage() {
     const [watchlistStatus,setWatchlistStatus ] = useState(watchlist.find((watchlistMovie) => watchlistMovie.id === movie.id));
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const VideoComponent = lazy(() => import('./Components/VideoComponent'))
+    const Poster = lazy(() => import('./Components/Poster'))
+
+    const PosterWithSuspense = withSuspense(Poster, <div className="animate-pulse rounded-3xl w-full h-[270px] bg-slate-200 flex items-center justify-center"></div>)
+    const VideoComponentWithSuspense = withSuspense(VideoComponent, <div className="animate-pulse rounded-3xl w-full h-[600px] bg-slate-200 flex items-center justify-center"> Loading.... </div>)
+    const DivWithSuspense = withSuspense(()=>{
+        return <div>{movie.directors?.map((director) => director.name).join(', ')}</div>
+    }, <div className="animate-pulse rounded-3xl w-full h-[270px] bg-slate-200 flex items-center justify-center"></div>)
 
     const handleAddToWatchlist = () => {
         dispatch(addMovieToWatchlist(movie))
@@ -31,7 +39,7 @@ export default function MoviePage() {
 
     useEffect(() => {
         setWatchlistStatus(watchlist.find((watchlistMovie) => watchlistMovie.id === movie.id))
-    }, [handleAddToWatchlist,handleDeleteFromWatchlist]);
+    }, [handleAddToWatchlist , handleDeleteFromWatchlist]);
 
     return(
         <div className={"flex flex-col  justify-center"}>
@@ -40,7 +48,7 @@ export default function MoviePage() {
                 <SearchBar/>
             </div>
             <div className={"flex flex-row justify-center"}>
-                <VideoComponent youtubeID={movie.video} />
+                <VideoComponentWithSuspense youtubeID={movie.video} />
             </div>
             <div className={"flex flex-row justify-center mt-2.5"}>
                 <div className={'grid grid-cols-6 gap-4 w-5/6'}>
@@ -48,15 +56,12 @@ export default function MoviePage() {
                         <div className={'col-start-1 col-span-4'}>
                             <div
                                 className={'flex flex-nowrap bg-gray-800 text-white items-center text-xl rounded-3xl'}>
-                                <div className={'p-4 flex-1 text-center'}>
-                                    {movie?.title}
-                                </div>
+                                <div className={'p-4 flex-1 text-center'}>{movie?.title}</div>
                                 *
                                 <div className={'p-4 flex-1 text-center'}>{movie?.release_date}</div>
                                 *
                                 <div className={'p-4 flex-1 text-center'}>{movie?.runtime}</div>
                                 *
-
                                 <div className={"flex p-4"}>
                                     <div className={"flex-1 text-center"}>{movie.genres?.map((genre) => genre.name).join(', ')}</div>
                                 </div>
@@ -92,7 +97,7 @@ export default function MoviePage() {
                                                 Director:
                                             </th>
                                             <td className="px-6 py-4">
-                                                {movie.directors?.map((director) => director.name).join(', ')}
+                                                <DivWithSuspense/>
                                             </td>
                                         </tr>
                                         <tr className="bg-white border-b">
@@ -123,7 +128,7 @@ export default function MoviePage() {
                     <div className={'grid grid-cols-subgrid gap-1 col-span-2'}>
                         <div className={'col-span-2 text-xl font-bold text-gray-800'}>Similar Movies:</div>
                         {movie.similar?.map((movie) => {
-                            return <Poster key={movie.id} movie={movie}/>
+                            return <PosterWithSuspense key={movie.id} movie={movie}/>
                         })}
                     </div>
                 </div>

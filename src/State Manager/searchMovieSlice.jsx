@@ -19,6 +19,7 @@ const searchMovieSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(fetchSearchMovies.pending, (state, action) => {
             console.log("fetching search movies")
+            state.movies =[];
         })
         builder.addCase(fetchSearchMovies.rejected, (state, action) => {
             console.log("failed to fetch search movies")

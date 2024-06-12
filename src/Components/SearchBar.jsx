@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { fetchSearchMovies } from "../State Manager/searchMovieSlice";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 
 export default function SearchBar() {
@@ -10,13 +10,23 @@ export default function SearchBar() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(searchTerm);
         if (searchTerm.trim()) {
             dispatch(fetchSearchMovies(searchTerm));
         }
         navigate('/search');
         setSearchTerm("")
     };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchTerm.trim()) {
+                dispatch(fetchSearchMovies(searchTerm));
+                navigate('/search');
+                setSearchTerm("")
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     const handleChange = (e) => {
         setSearchTerm(e.target.value);
