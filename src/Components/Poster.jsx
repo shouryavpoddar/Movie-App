@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useDispatch} from "react-redux";
-import {fetchMovie, fetchMovieCredits, fetchSimilar, fetchVideo} from "../State Manager/focusMovieSlice";
+
 import {useNavigate} from "react-router-dom";
 import {useQueryClient} from "@tanstack/react-query";
 
@@ -10,8 +10,9 @@ function Poster({movie}) {
     const queryClient = useQueryClient();
 
     const handleClick = () => {
-        queryClient.setQueryData('movieId', movie.id);
-        dispatch(fetchMovie(movie.id));
+        queryClient.invalidateQueries('movie');
+        queryClient.setQueryData('movieId', movie.id)
+        // dispatch(fetchMovie(movie.id));
         navigate('/movie');
     }
 

@@ -1,12 +1,9 @@
-import { useDispatch } from "react-redux";
-import { fetchSearchMovies } from "../State Manager/searchMovieSlice";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useQueryClient} from "@tanstack/react-query";
 
 export default function SearchBar() {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState("");
 

@@ -6,6 +6,7 @@ import {Provider} from "react-redux";
 import {store} from "./State Manager/store";
 import SearchPage from "./SearchPage";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import CategoriesPage from "./CategoriesPage";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +19,7 @@ function App() {
                       <Route path="/" element={<Home />} />
                       <Route path="/movie" element={<MoviePage />} />
                       <Route path='/search' element={<SearchPage />} />
+                      <Route path='/genre' element={<CategoriesPage/>} />
                   </Routes>
               </Router>
           </Provider>

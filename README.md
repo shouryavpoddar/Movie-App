@@ -27,7 +27,6 @@ The project is structured into several React components and Redux slices. Here a
 - `src/Home.jsx`: This file contains the Home component which displays the trending, new release, and top-rated movies.
 - `src/MoviePage.jsx`: This file contains the MoviePage component which displays detailed information about a selected movie.
 - `src/State Manager/homePageSlice.jsx`: This file contains the Redux slice for managing the state of the home page.
-- `src/State Manager/focusMovieSlice.jsx`: This file contains the Redux slice for managing the state of the selected movie.
 - `src/State Manager/watchlistSlice.jsx`: This file contains the Redux slice for managing the watchlist.
 
 ## API
