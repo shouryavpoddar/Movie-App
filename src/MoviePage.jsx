@@ -7,6 +7,7 @@ import withSuspense from "./hoc/withSuspence";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import {fetchMovieCredit, fetchMovieDetails, fetchSimilarMovies, fetchVideos} from "./ApiServicer/Api";
 import VideoComponent from "./Components/VideoComponent";
+import MovieCreditsTable from "./Components/MovieCreditsTable";
 
 export default function MoviePage() {
     const watchlist = useSelector(state => state.watchlist.movies);
@@ -115,42 +116,7 @@ export default function MoviePage() {
                             <div className={'col-start-1 col-span-4'}>{movie?.overview} </div>
                             <div className={'col-start-1 col-span-4'}>
                                 <div className="relative overflow-x-auto">
-                                    <table
-                                        className="w-full text-sm text-left rtl:text-right text-gray-500">
-                                        <tbody>
-                                        <tr className="bg-white border-b">
-                                            <th scope="row"
-                                                className="px-6 py-4 text-xl font-medium text-gray-900 whitespace-nowrap">
-                                                Director:
-                                            </th>
-                                            <td className="px-6 py-4">
-                                                <div>{  isMovieCreditsLoading? 'Loading...' :
-                                                    movieCredits?.directors?.map((director) => director.name).join(', ')}</div>
-                                            </td>
-                                        </tr>
-                                        <tr className="bg-white border-b">
-                                            <th scope="row"
-                                                className="px-6 py-4 text-xl font-medium text-gray-900 whitespace-nowrap ">
-                                                Writers:
-                                            </th>
-                                            <td className="px-6 py-4">
-                                                { isMovieCreditsLoading? 'Loading...' :
-                                                    movieCredits?.writers?.map((writer) => writer.name).join(', ')
-                                                }
-                                            </td>
-                                        </tr>
-                                        <tr className="bg-white border-b">
-                                            <th scope="row"
-                                                className="px-6 text-xl py-4 font-medium text-gray-900 whitespace-nowrap">
-                                                Stars:
-                                            </th>
-                                            <td className="px-6 py-4">
-                                                { isMovieCreditsLoading? 'Loading...' :
-                                                    movieCredits?.topCast?.map((actor) => actor.name).join(', ')}
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                    <MovieCreditsTable movieCredits={movieCredits} isMovieCreditsLoading={isMovieCreditsLoading}/>
                                 </div>
 
                             </div>
