@@ -86,6 +86,12 @@ export const fetchMoviesByGenre = async (genreId) => {
 }
 
 export const fetchMovieBySearchName = async (searchName) => {
-    const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${searchName}&include_adult=false&language=en-US&page=1`, options).then(response => response.json())
-    return response.results;
+    console.log(searchName)
+    const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${searchName}&include_adult=false&language=en-US&page=1`, options)
+    if(!response.ok){
+        throw new Error('Failed to fetch Movie By Search Name');
+    }
+
+    const data = await response.json()
+    return  data.results;
 }
